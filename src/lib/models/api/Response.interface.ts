@@ -1,6 +1,6 @@
 export interface ApiResponse<T> {
   message: string;
-  data: FindResponse<T>;
+  data: T;
 }
 
 export interface FindResponse<T> {

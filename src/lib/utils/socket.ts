@@ -4,7 +4,6 @@ export function InitSocket(url: string) {
 
     return socket;
   } catch (error) {
-    console.log("error", error);
     console.log(JSON.stringify(error));
   }
 }
