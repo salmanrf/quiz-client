@@ -1,49 +1,16 @@
-const QUIZ_URL = "http://localhost:8080/api/quiz";
+import type { ApiResponse } from "src/lib/models/api/Response.interface";
+import type { Quiz } from "src/lib/models/quiz/Quiz.interface";
 
-export async function fetchCreateQuizzes() {
+const QUIZ_URL = "http://192.168.0.16:8080/api/quiz";
+
+export interface CreateQuizResponse {
+  title: string;
+  code: string;
+}
+
+export async function fetchCreateQuiz(quiz: Quiz) {
   try {
-    const body = JSON.stringify({
-      code: "ashquiz",
-      title: "AshiapQuiz",
-      questions: [
-        {
-          type: "multiple-answer",
-          description: "",
-          answers: [
-            {
-              value: "1",
-              correct: true,
-            },
-            {
-              value: "2",
-              correct: true,
-            },
-            {
-              value: "3",
-              correct: false,
-            },
-          ],
-        },
-        {
-          type: "single-answer",
-          description: "",
-          answers: [
-            {
-              value: "1",
-              correct: true,
-            },
-            {
-              value: "2",
-              correct: false,
-            },
-            {
-              value: "3",
-              correct: false,
-            },
-          ],
-        },
-      ],
-    });
+    const body = JSON.stringify(quiz);
 
     const res = await fetch(QUIZ_URL, {
       method: "POST",
@@ -53,9 +20,9 @@ export async function fetchCreateQuizzes() {
       body,
     });
 
-    const { body: data } = await res.json();
+    const result: Promise<ApiResponse<CreateQuizResponse>> = await res.json();
 
-    return data;
+    return result;
   } catch (error) {
     throw error;
   }
