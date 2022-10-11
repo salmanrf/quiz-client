@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { Room } from "src/lib/interfaces/room/Room.interface";
-  export let room: Room;
+  import ActionButton from "src/lib/components/ui/ActionButton.svelte";
+  import type { Room } from "src/lib/models/room/Room.interface";
 
-  $: {
-    console.log('room', room);
-  }
-  
+  export let select_room: () => void
+  export let room: Room;
+  export let loading: boolean = false
+
 </script>
 
 <div class="mb-4 p-2 rounded-md shadow-sm shadow-slate-800 text-slate-800">
@@ -20,6 +20,10 @@
     <div class="font-medium">
       Code: {room.code}
     </div>
-    <button class="py-2 px-3 rounded-md bg-teal-500 text-white">Join</button>
+    <ActionButton 
+      text="Join" 
+      loading={loading}
+      on_click={select_room}
+    />
   </div>
 </div>
