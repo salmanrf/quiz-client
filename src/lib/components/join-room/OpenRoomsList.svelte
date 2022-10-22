@@ -6,14 +6,12 @@
   import { onMount } from "svelte";
   import Input from "src/lib/components/form/Input.svelte";
   import JoinQuizForm from "src/lib/components/join-room/JoinQuizForm.svelte";
-  import { socket_store } from "src/lib/stores/socket-store";
   import Modal from "src/lib/components/ui/Modal.svelte";
   import ActionButton from "src/lib/components/ui/ActionButton.svelte";
-  import { push_notification } from "src/lib/stores/notification-store";
 
   let rooms: Room[] = [];
   let loading = false;
-  let selected_room: Room 
+  let selected_room: Room; 
   
   let username = ""
   let password = ""
@@ -39,23 +37,7 @@
 
     loading = true;
 
-    const socket = fetchJoinRoom(selected_room.code, username, password)
-    
-    if(socket) {
-      socket.addEventListener("error", () => {
-        push_notification({content: "Unable to connect to server.", ttl: 2500})
-
-        loading = false
-      })
-
-      socket.addEventListener("open", () => {
-        push_notification({content: "Connected!.", ttl: 2500})
-
-        loading = false
-      })
-      
-      socket_store.set(socket)
-    }
+    fetchJoinRoom(selected_room.code, username, password)
   }
 </script>
 

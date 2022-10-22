@@ -30,8 +30,6 @@ export function register_join_handlers(ws: WebSocket) {
 export function unregister_join_handlers(ws: WebSocket) {
   ws.removeEventListener("message", handle_message);
   ws.removeEventListener("error", handle_error);
-
-  handlers = new Map<string, (e: Message<any>) => void>();
 }
 
 function handle_join_room(message: Message<JoinRoomMessage>) {

@@ -1,52 +1,72 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { register_room_handlers, unregister_room_handlers } from "./lib/handlers/room-handlers";
   import JoinRoomPage from "src/lib/pages/main/components/JoinRoomPage.svelte";
   import AdminRoomPage from "src/lib/pages/room-page/AdminRoomPage.svelte";
   import MemberRoomPage from "src/lib/pages/room-page/MemberRoomPage.svelte";
   import { socket_store } from "src/lib/stores/socket-store";
   import { user_store } from "src/lib/stores/user.store";
-  import { notification_store } from "./lib/stores/notification-store";
-  import { fly } from "svelte/transition";
+  import ToastContainer from "src/lib/components/ui/ToastContainer.svelte";
+  import type { Message } from "src/lib/models/messages/message.model";
+  import type { JoinRoomMessage } from "src/lib/models/messages/join-room-message.model";
+  import { room_store } from "src/lib/stores/room-store";
+  import { push_notification } from "src/lib/stores/notification-store";
 
+  let transition_to: Promise<number> = null;
+  
   $: {
     if($socket_store) {
-      register_room_handlers($socket_store)
+      $socket_store.on("room_join", (message: Message<JoinRoomMessage>) => {
+        const { data } = message;
+        const { id, username, role, room } = data;
+
+        room_store.set({ ...room });
+        user_store.set({ id, role, username });
+        push_notification({content: "Connected!", ttl: 2500})
+      })
     }
+  }
+
+  $: {
+    transition_to = createTimeout($user_store.role, 750)
+  }
+  
+  function createTimeout(to: number, duration: number): Promise<number> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(to)
+      }, duration)
+    }) 
   }
 
   onDestroy(() => {
     if($socket_store) {
-      unregister_room_handlers($socket_store)
+      $socket_store.close()
     }
   })
 </script>
 
 <!-- ? Notification Container -->
-<div class="fixed bottom-8 w-full flex flex-col-reverse justify-center items-center z-10 shadow-md">
-  {#each $notification_store as notification}
-    {#if notification.show}
-      <div 
-        class="mt-3 py-3 px-6 bg-white rounded"
-        transition:fly={{y: 32, duration: 500}}
-      >
-        {notification.content}
-      </div>
-    {/if}
-  {/each}
-</div>
+<ToastContainer />
 <!-- ? Notification Container -->
 
 <main class="flex justify-center items-center">
   {#if !$user_store.role}
     <JoinRoomPage />
   {/if}
-  {#if $user_store.role === 1}
-    <AdminRoomPage />
-  {/if}
-  {#if $user_store.role === 2}
-    <MemberRoomPage />
-  {/if}
+  {#await transition_to}
+    {null}
+  {:then role}
+    {#if role === 1}
+      <AdminRoomPage />
+    {/if}
+  {/await}
+  {#await transition_to}
+    {null}
+  {:then role}
+    {#if role === 2}
+      <MemberRoomPage />
+    {/if}
+  {/await}
 </main>
 
 <style>

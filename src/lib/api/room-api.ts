@@ -47,13 +47,11 @@ export async function fetchFindRooms(): Promise<FindResponse<Room>> {
   }
 }
 
-export function fetchJoinRoom(room_code: string, username: string, password: string): WebSocket {
+export function fetchJoinRoom(room_code: string, username: string, password: string) {
   try {
     const socket = InitSocket(
       `${WS_ROOM_URL}?room_code=${room_code}&username=${username}&password=${password}`
     );
-
-    return socket;
   } catch (error) {
     console.error("Error", error);
   }

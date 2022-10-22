@@ -3,7 +3,6 @@
   import { fetchCreateRoom, fetchJoinRoom } from "src/lib/api/room-api";
   import type { Question } from "src/lib/models/quiz/Quiz.interface";
   import type { Room, RoomQuizData } from "src/lib/models/room/Room.interface";
-  import { socket_store } from "src/lib/stores/socket-store";
   import { fade } from "svelte/transition";
   import GeneralRoomForm from "src/lib/components/join-room/RoomForm/GeneralRoomForm.svelte";
   import RoomQuizForm from "src/lib/components/join-room/RoomForm/RoomQuizForm.svelte";
@@ -64,9 +63,7 @@
 
       const {code} = room_res.data
       
-      const new_socket = fetchJoinRoom(code, room.admin_name, room.password)
-
-      socket_store.set(new_socket)
+      fetchJoinRoom(code, room.admin_name, room.password)
     } catch(error) {
       console.log('error', error);
     } finally {
